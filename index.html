@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SJF Scheduling Algorithm</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Shortest Job First Scheduling (SJF)</h1>
+
+        <div class="form-container">
+            <label for="processCount">Number of Processes:</label>
+            <input type="number" id="processCount" min="1" value="3" />
+
+            <button onclick="generateProcesses()">Generate Processes</button>
+        </div>
+
+        <div class="processes-container" id="processesContainer"></div>
+
+        <button onclick="calculateSJF()">Calculate SJF Scheduling</button>
+
+        <div id="output">
+            <h2>Result</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Process ID</th>
+                        <th>Burst Time</th>
+                        <th>Arrival Time</th>
+                        <th>Completion Time (C.T.)</th>
+                        <th>Turnaround Time (T.A.T.)</th>
+                        <th>Waiting Time (W.T.)</th>
+                        <th>Response Time (R.T.)</th>
+                    </tr>
+                </thead>
+                <tbody id="resultTable"></tbody>
+            </table>
+            <p id="averageTurnaroundTime"></p>
+            <p id="averageWaitingTime"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
