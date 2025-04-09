@@ -6,7 +6,7 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    background-color: #e0f7fa; /* Light teal background */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,15 +16,15 @@ body {
 .container {
     width: 80%;
     max-width: 800px;
-    background-color: #fff;
+    background-color: #ffffff; /* White background for the main container */
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 h1 {
     text-align: center;
-    color: #333;
+    color: #00796b; /* Teal text color */
     margin-bottom: 20px;
 }
 
@@ -38,21 +38,22 @@ h1 {
 input[type="number"] {
     width: 60px;
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid #bdbdbd;
     border-radius: 4px;
 }
 
 button {
     padding: 10px 20px;
-    background-color: #28a745;
-    color: #fff;
+    background-color: #00796b; /* Teal button color */
+    color: #ffffff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #004d40; /* Darker teal on hover */
 }
 
 .processes-container {
@@ -74,26 +75,31 @@ button:hover {
 
 h2 {
     text-align: center;
-    color: #333;
+    color: #00796b; /* Teal text color for subheadings */
 }
 
 table {
     width: 100%;
     margin-top: 20px;
     border-collapse: collapse;
+    background-color: #f9fbe7; /* Pale green background for table */
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 table th, table td {
     padding: 10px;
     text-align: center;
-    border: 1px solid #ccc;
+    border: 1px solid #c8e6c9; /* Light green borders */
 }
 
 table th {
-    background-color: #f4f4f9;
+    background-color: #81c784; /* Light green for table headers */
+    color: #ffffff; /* White text for headers */
 }
 
 #averageTurnaroundTime, #averageWaitingTime {
     margin-top: 20px;
     font-weight: bold;
+    color: #004d40; /* Dark teal text */
 }
