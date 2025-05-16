@@ -1,47 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SJF Scheduling Algorithm</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Banker's Algorithm Visualizer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #c9d6ff, #e2e2e2);
+      color: #2c3e50;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #34495e;
+      margin-bottom: 40px;
+    }
+
+    .input-section {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .input-section label {
+      font-size: 1rem;
+      color: #2c3e50;
+    }
+
+    .input-section input {
+      margin-left: 10px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 60px;
+      font-size: 14px;
+    }
+
+    .matrix-inputs {
+      max-width: 1000px;
+      margin: 0 auto 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .matrix-table {
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 16px;
+      padding: 1.2rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(12px);
+      transition: 0.3s;
+    }
+
+    .matrix-table h3 {
+      font-size: 1.2rem;
+      color: #0077b6;
+      margin-bottom: 0.8rem;
+      border-left: 4px solid #00b4d8;
+      padding-left: 10px;
+    }
+
+    .matrix-table div {
+      margin: 5px 0;
+    }
+
+    .matrix-table input {
+      width: 55px;
+      padding: 7px;
+      margin: 3px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #f8f9fa;
+      transition: 0.2s;
+    }
+
+    .matrix-table input:focus {
+      border-color: #00b4d8;
+      background-color: #e0f7fa;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: linear-gradient(to right, #00b4d8, #0077b6);
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #0077b6, #023e8a);
+      transform: scale(1.05);
+    }
+
+    .check-btn {
+      display: block;
+      margin: 0 auto;
+    }
+
+    .result {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      font-size: 1.25rem;
+      text-align: center;
+      border-radius: 12px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .result.safe {
+      background-color: #d0f5d3;
+      color: #1b5e20;
+      border: 2px solid #66bb6a;
+      box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+    }
+
+    .result.unsafe {
+      background-color: #ffdde0;
+      color: #c62828;
+      border: 2px solid #ef5350;
+      box-shadow: 0 0 12px rgba(239, 83, 80, 0.4);
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .matrix-table input {
+        width: 40px;
+      }
+
+      .input-section input {
+        width: 50px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Shortest Job First Scheduling (SJF)</h1>
+  <h1>💻 Banker's Algorithm - Deadlock Avoidance</h1>
+  <div class="input-section">
+    <label>Processes: <input type="number" id="numProcesses" min="1"></label>
+    <label>Resources: <input type="number" id="numResources" min="1"></label>
+    <button onclick="generateInput()">Generate Matrices</button>
+  </div>
 
-        <div class="form-container">
-            <label for="processCount">Number of Processes:</label>
-            <input type="number" id="processCount" min="1" value="3" />
+  <div id="matrixInputs" class="matrix-inputs"></div>
+  <button onclick="checkSafety()" class="check-btn">Check Safe State</button>
+  <div id="result" class="result"></div>
 
-            <button onclick="generateProcesses()">Generate Processes</button>
-        </div>
+  <script>
+    function generateInput() {
+      const p = parseInt(document.getElementById("numProcesses").value);
+      const r = parseInt(document.getElementById("numResources").value);
+      const container = document.getElementById("matrixInputs");
+      container.innerHTML = "";
 
-        <div class="processes-container" id="processesContainer"></div>
+      ["Max Demand", "Allocation", "Available"].forEach(type => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "matrix-table";
+        const title = document.createElement("h3");
+        title.textContent = `${type} Matrix`;
+        wrapper.appendChild(title);
 
-        <button onclick="calculateSJF()">Calculate SJF Scheduling</button>
+        for (let i = 0; i < (type === "Available" ? 1 : p); i++) {
+          const row = document.createElement("div");
+          for (let j = 0; j < r; j++) {
+            const input = document.createElement("input");
+            input.type = "number";
+            input.id = `${type}_${i}_${j}`;
+            row.appendChild(input);
+          }
+          wrapper.appendChild(row);
+        }
+        container.appendChild(wrapper);
+      });
+    }
 
-        <div id="output">
-            <h2>Result</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Process ID</th>
-                        <th>Burst Time</th>
-                        <th>Arrival Time</th>
-                        <th>Completion Time (C.T.)</th>
-                        <th>Turnaround Time (T.A.T.)</th>
-                        <th>Waiting Time (W.T.)</th>
-                        <th>Response Time (R.T.)</th>
-                    </tr>
-                </thead>
-                <tbody id="resultTable"></tbody>
-            </table>
-            <p id="averageTurnaroundTime"></p>
-            <p id="averageWaitingTime"></p>
-        </div>
-    </div>
+    function getMatrix(type, rows, cols) {
+      const matrix = [];
+      for (let i = 0; i < rows; i++) {
+        const row = [];
+        for (let j = 0; j < cols; j++) {
+          row.push(parseInt(document.getElementById(`${type}_${i}_${j}`).value) || 0);
+        }
+        matrix.push(row);
+      }
+      return matrix;
+    }
 
-    <script src="script.js"></script>
+    function calculateNeed(max, alloc) {
+      return max.map((row, i) => row.map((val, j) => val - alloc[i][j]));
+    }
+
+    function isSafe(p, r, available, max, alloc) {
+      const need = calculateNeed(max, alloc);
+      const finish = Array(p).fill(false);
+      const work = [...available];
+      const safeSeq = [];
+
+      let count = 0;
+      while (count < p) {
+        let found = false;
+        for (let i = 0; i < p; i++) {
+          if (!finish[i] && need[i].every((n, j) => n <= work[j])) {
+            for (let j = 0; j < r; j++) work[j] += alloc[i][j];
+            finish[i] = true;
+            safeSeq.push(i);
+            found = true;
+            count++;
+          }
+        }
+        if (!found) return null;
+      }
+      return safeSeq;
+    }
+
+    function createTable(title, matrix, isSingleRow = false) {
+      let html = `<div class='matrix-table'><h3>${title}</h3><table><tbody>`;
+      if (isSingleRow) {
+        html += "<tr>";
+        matrix.forEach(val => html += `<td>${val}</td>`);
+        html += "</tr>";
+      } else {
+        matrix.forEach(row => {
+          html += "<tr>";
+          row.forEach(val => html += `<td>${val}</td>`);
+          html += "</tr>";
+        });
+      }
+      html += "</tbody></table></div>";
+      return html;
+    }
+
+    function checkSafety() {
+      const p = parseInt(document.getElementById("numProcesses").value);
+      const r = parseInt(document.getElementById("numResources").value);
+      const available = getMatrix("Available", 1, r)[0];
+      const max = getMatrix("Max Demand", p, r);
+      const alloc = getMatrix("Allocation", p, r);
+      const need = calculateNeed(max, alloc);
+
+      const safeSeq = isSafe(p, r, available, max, alloc);
+      const result = document.getElementById("result");
+
+      let output = "";
+      output += createTable("Available Resources", available, true);
+      output += createTable("Maximum Demand Matrix", max);
+      output += createTable("Allocation Matrix", alloc);
+      output += createTable("Remaining Need Matrix", need);
+
+      if (safeSeq) {
+        output += `<div class="safe">✅ System is in a SAFE state.<br><strong>Safe Sequence:</strong> ${safeSeq.map(i => "P" + i).join(" → ")}</div>`;
+        result.className = "result safe";
+      } else {
+        output += `<div class="unsafe">❌ System is NOT in a safe state.</div>`;
+        result.className = "result unsafe";
+      }
+
+      result.innerHTML = output;
+    }
+  </script>
 </body>
 </html>
+
